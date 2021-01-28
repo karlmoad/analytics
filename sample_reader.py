@@ -13,15 +13,13 @@ class SampleReader(input_reader.InputReader):
         os.chdir(self.directory)
         id = 1
         for file in glob.glob("*.pdf"):
-            doc = {"id": id, "language": "en"}
+            doc = {"id": id, "name": file, "text": ""}
             pdfInputFile = open(file, 'rb')
             pdfReader = PyPDF2.PdfFileReader(pdfInputFile)
             for i in range(pdfReader.numPages):
                 pageObj = pdfReader.getPage(i)
-                doc['text'] = doc.get('text', '') + pageObj.extractText()
+                doc["text"] = doc["text"] + " " + pageObj.extractText()
             pdfInputFile.close()
             out.append(doc)
             id+=1
         return out
-
-
