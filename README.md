@@ -13,10 +13,10 @@ libraries utilized:
 - azure-ai-textanalytics
 
 
-###create a config file for azure settings named **config.yaml** with the following contents:
+### create a config file for azure settings named **config.yaml** with the following contents:
 
 `azure:
   endpoint: <endpoint uri>
   key: <api key>`
 
-###create subdirectory **dumps** relative to the location of the code, the program will output the results to this directory
+### create subdirectory **dumps** relative to the location of the code, the program will output the results to this directory
