@@ -20,9 +20,9 @@ def main(config):
     # load sample documents from docs folder
     path = os.path.join(os.curdir, 'docs')
     reader = sample_reader.SampleReader(path)
-    documents = reader.process()
+    data = reader.process()
 
-    print("Documents [{}]".format(len(documents)))
+    print("Documents [{}]".format(len(data)))
 
     # --------------------------------------------------------------------
     # per Microsoft documentation concerning document size a data limits
@@ -37,56 +37,52 @@ def main(config):
 
     formatter = sample_formatter.SampleFormatter(limit=4000, noexceed=5100)
 
-    for d in documents:
-        print("Document:{} Size:{}".format(d["name"], len(d["text"])))
-        prepared = formatter.prepare(document=d)
-        for item in prepared:
+    for document in data:
+        print("Document:{} Size:{}".format(document["name"], len(document["text"])))
+        batch = formatter.prepare(document=document)
+        for item in batch:
             print("Id:{} Size:{}".format(item["id"], len(item["text"])))
 
+        print("Processing batch with MS Text Analytics..")
+        poller = client.begin_analyze_healthcare(batch, show_stats=True)
+        result = poller.result()
 
+        print("Results of Healthcare Analysis:")
+        rez = []
+        docs = [doc for doc in result if not doc.is_error]
+        for idx, doc in enumerate(docs):
+            rezd = {"id": doc.id}
+            entities=[]
+            relations=[]
+            for entity in doc.entities:
+                e = {
+                    "entity": entity.text,
+                    "category": entity.category,
+                    "subcategory": entity.subcategory,
+                    "offset": entity.offset,
+                    "score": entity.confidence_score,
+                }
+                entities.append(e)
 
+            for relation in doc.relations:
+                r = {
+                    "source": relation.source.text,
+                    "target": relation.target.text,
+                    "type": relation.relation_type,
+                    "is_bidirectional": relation.is_bidirectional
+                }
+                relations.append(r)
+            rezd["entities"] = entities
+            rezd["relations"] = relations
+            rez.append(rezd)
+        document["results"] = rez
 
+    # write output
 
-
-
-
-    # poller = client.begin_analyze_healthcare(documents, show_stats=True)
-    # result = poller.result()
-    #
-    # print("Results of Healthcare Analysis:")
-    # rez = []
-    # docs = [doc for doc in result if not doc.is_error]
-    # for idx, doc in enumerate(docs):
-    #     rezd = {"id": doc.id}
-    #     entities=[]
-    #     relations=[]
-    #     for entity in doc.entities:
-    #         e = {
-    #             "entity": entity.text,
-    #             "category": entity.category,
-    #             "subcategory": entity.subcategory,
-    #             "offset": entity.offset,
-    #             "score": entity.confidence_score,
-    #         }
-    #         entities.append(e)
-    #
-    #     for relation in doc.relations:
-    #         r = {
-    #             "source": relation.source.text,
-    #             "target": relation.target.text,
-    #             "type": relation.relation_type,
-    #             "is_bidirectional": relation.is_bidirectional
-    #         }
-    #         relations.append(r)
-    #     rezd["entities"] = entities
-    #     rezd["relations"] = relations
-    #     rez.append(rezd)
-    #
-    # # write output
-    # outputFile = os.path.join(os.curdir, "dumps", "out.json")
-    # print("Writing output file [{}}.".format(outputFile))
-    # with open(outputFile, 'w') as out:
-    #     json.dump(rez, out)
+    outputFile = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dumps", "out.json")
+    print("Writing output file [{}].".format(outputFile))
+    with open(outputFile, 'w+') as out:
+        json.dump(data, out)
 
 if __name__ == '__main__':
     with open("config.yaml","r") as yamlfile:

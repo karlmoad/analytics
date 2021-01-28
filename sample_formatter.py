@@ -5,7 +5,7 @@ class SampleFormatter(formatter.Formatter):
     # Notes: -----------------------------------------------------------------
     # * block size determined by self.lim value
     # * document id is derived from original document id multi by 100 + block id
-    # * pages may be broken across blocks
+    # * document is broken into x blocks and formatted to prepared output spec
     def prepare(self, document: dict) -> list:
         out = []
         baseDocid = document["id"]
