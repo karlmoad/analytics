@@ -131,3 +131,6 @@ dmypy.json
 
 #project
 config.yaml
+dumps/
+dumps/..
+/dumps/
