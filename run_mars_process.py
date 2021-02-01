@@ -14,6 +14,9 @@ def mars(config, argv):
         print("Invalid inputs")
         return
 
+    dtStart = datetime.datetime.utcnow()
+    apiTime=[]
+
     directory = argv[1]
     inputFile = argv[2]
     outputDir = argv[3]
@@ -65,8 +68,14 @@ def mars(config, argv):
         d["chunks"] = chunks
 
         try:
+            dtApiStart = datetime.datetime.utcnow()
             poller = client.begin_analyze_healthcare(batch, show_stats=True)
             result = poller.result()
+            dtApiEnd = datetime.datetime.utcnow()
+
+            ttr = {"start": dtApiStart, "end": dtApiEnd, "seconds": (dtApiEnd-dtApiStart).total_seconds()}
+            apiTime.append(ttr)
+
             rez = []
             results = [r for r in result if not r.is_error]
             for idx, r in enumerate(results):
@@ -102,6 +111,9 @@ def mars(config, argv):
             print("Document: {} --- complete".format(d["id"]))
 
     dt = datetime.datetime.utcnow()
+
+    print("Process complete, Total run time {} seconds".format((dt-dtStart).total_seconds()))
+
     eo = datetime.datetime(1970, 1, 1)
     epoch = (dt - eo).total_seconds()
 
