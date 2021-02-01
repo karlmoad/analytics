@@ -28,7 +28,7 @@ def mars(config, argv):
     # load sample documents from docs folder
     path = os.path.join(directory, inputFile)
 
-    print("Processing: {}".format(path))
+    print("Input File: {}".format(path))
 
     reader = mars_reader.MarsReader(path)
     data = reader.process()
@@ -51,6 +51,7 @@ def mars(config, argv):
     formatter = mars_formatter.MarsFormatter(limit=4500, noexceed=5100)
 
     for d in data:
+        print("Document: {} -- processing".format(d["id"]))
         batch = formatter.prepare(d)
 
         chunks = []
@@ -97,6 +98,8 @@ def mars(config, argv):
             d["error"] = False
         except:
             d["error"] = True
+        finally:
+            print("Document: {} --- complete".format(d["id"]))
 
     dt = datetime.datetime.utcnow()
     eo = datetime.datetime(1970, 1, 1)
