@@ -59,8 +59,8 @@ def mars(config, argv):
 
         # save chunking offsets so that positional findings in results can be re-attributed to orig
         for item in batch:
-            chunk = {"id": item["id"], "start": offset, "end": offset + len(item["text"])}
-            offset = len(item["text"]) + 1
+            chunk = {"id": item["id"], "start": offset, "length": len(item["text"])}
+            offset += len(item["text"])
             chunks.append(chunk)
         d["chunks"] = chunks
 
