@@ -4,6 +4,7 @@ import yaml
 import os
 import json
 import sys
+import datetime
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.textanalytics import TextAnalyticsClient
 
@@ -96,13 +97,15 @@ def mars(config, argv):
             d["error"] = False
         except:
             d["error"] = True
-        finally:
-            # write output to an individual file per input doc
-            # temporary just to better enable review, single file output would be very large
-            outputFile = os.path.join(directory, outputDir, "output_{}.json".format(d["id"]))
-            print("Writing output file [{}].".format(outputFile))
-            with open(outputFile, 'w+') as out:
-                json.dump(data, out)
+
+    dt = datetime.datetime.utcnow()
+    eo = datetime.datetime(1970, 1, 1)
+    epoch = (dt - eo).total_seconds()
+
+    outputFile = os.path.join(directory, outputDir, "output_{}.json".format(epoch))
+    print("Writing output file [{}].".format(outputFile))
+    with open(outputFile, 'w+') as out:
+        json.dump(data, out)
 
 if __name__ == "__main__":
     with open("config.yaml","r") as yamlfile:
