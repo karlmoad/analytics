@@ -89,7 +89,15 @@ def mars(config, argv):
                         "subcategory": entity.subcategory,
                         "offset": entity.offset,
                         "score": entity.confidence_score,
+                        "links": [],
                     }
+                    if entity.links is not None:
+                        links=[]
+                        for link in entity.links:
+                            l = {"id": link.id, "source": link.data_source}
+                            links.append(l)
+                        e["links"] = links
+
                     entities.append(e)
 
                 for relation in r.relations:
