@@ -39,7 +39,7 @@ def mars(config, argv):
     print("Documents read: {}".format(len(data)))
 
     # temp take only a small part of total
-    data = data[:100]
+    data = data[100:200]
 
     # --------------------------------------------------------------------
     # per Microsoft documentation concerning document size a data limits
@@ -121,6 +121,10 @@ def mars(config, argv):
     print("Writing output file [{}].".format(outputFile))
     with open(outputFile, 'w+') as out:
         json.dump(data, out)
+
+    apiMetricsFile = os.path.join(directory, outputDir, "metrics_{}.json".format(epoch))
+    with open(apiMetricsFile, 'w+') as out:
+        json.dump(apiTime, out)
 
 if __name__ == "__main__":
     with open("config.yaml","r") as yamlfile:
