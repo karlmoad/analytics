@@ -73,7 +73,7 @@ def mars(config, argv):
             result = poller.result()
             dtApiEnd = datetime.datetime.utcnow()
 
-            ttr = {"start": dtApiStart, "end": dtApiEnd, "seconds": (dtApiEnd-dtApiStart).total_seconds()}
+            ttr = {"record": d.id,  "seconds": (dtApiEnd-dtApiStart).total_seconds()}
             apiTime.append(ttr)
 
             rez = []
